@@ -1,0 +1,35 @@
+version: '3.9'
+
+services:
+  admin_api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: "python manage.py runserver 0:8000"
+    ports:
+      - "8080:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+
+  queue:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: "python consumer.py"
+    depends_on:
+      - db
+
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: admin
+      MYSQL_USER: aaman007
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: password
+    volumes:
+      - .db:/var/lib/mysql
+    ports:
+      - "33066:3306"
